@@ -1,0 +1,22 @@
+{
+  "name": "projectmanagement_project",
+  "version": "1.0.0",
+  "description": "A project Management Application",
+  "keywords": [
+    "MERN",
+    "project",
+    "API",
+    "creation",
+    "RestAPI"
+  ],
+  "license": "ISC",
+  "author": "@dhruvagrawal013",
+  "type": "module",
+  "main": "index.js",
+  "scripts": {
+    "dev": "node index.js"
+  },
+  "devDependencies": {
+    "prettier": "3.8.1"
+  }
+}
