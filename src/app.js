@@ -16,6 +16,11 @@ app.use(cors({
     
 }))
 
+// import routes
+import healthCheckRoute from "./routes/healthcheck.routes.js"
+
+app.use("/api/v1/healthcheck", healthCheckRoute)
+
 app.get("/instagram", (req, res) => {
     res.send("Welcome to Instagram")
 })
