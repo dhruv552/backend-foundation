@@ -1,0 +1,72 @@
+import { User } from '../models/user.model.js';
+import { apiResponse } from '../utils/api-response.js';
+import { asyncHandler } from '../utils/async-handler.js';
+import { apiError } from '../utils/api-error.js';
+import { emailVerificationMailgenContent, sendEmail } from '../utils/mail.js';
+
+const generateAccessandRefreshTokens = async (userId) => {
+    try {
+        const user = await User.findById(userId)
+        const accessToken = user.generateAccessToken()
+        const refreshToken = user.generateRefreshToken()
+
+        user.refreshToken = refreshToken
+        await user.save({ validateBeforeSave: false })
+        return { accessToken, refreshToken }
+
+
+    } catch (error) {
+        throw new apiError(500, "Failed to generate access and refresh tokens")
+
+    }
+}
+
+const registerUser = asyncHandler(async (req, res) => {
+
+    const { email, username, password, role } = req.body
+    const existedUser = await User.findOne({
+        $or: [{ email }, { username }]
+    })
+    if (existedUser) {
+        throw new apiError(409, "User with the provided email or username already exists.")
+    }
+    const user = await User.create({
+        email,
+        username,
+        password,
+        isEmailVerified: false,
+
+    })
+
+    const { unHashedToken, hashedToken, hashedTokenExpiration } = user.generateTemporaryToken();
+
+    user.emailVerificationToken = hashedToken
+    user.emailVerificationExpiry = hashedTokenExpiration
+
+    await user.save({ validateBeforeSave: false })
+
+    await sendEmail({
+        email: user?.email,
+        subject: "Email Verification for Project Management App",
+        mailgenContent: emailVerificationMailgenContent(
+            user.username,
+            `${req.protocol}://${req.get("host")}/api/v1/auth/verify-email?token=${unHashedToken}`
+        )
+
+    })
+    const CreatedUser = await User
+        .findById(user._id)
+        .select("-password -refreshToken -emailVerificationToken -emailVerificationExpiry")
+
+    if (!CreatedUser) {
+        throw new apiError(500, "Something went wrong while creating the user. Please try again.")
+    }
+    return res
+        .status(201)
+        .json(new apiResponse(200, "User registered successfully. Please check your email to verify your account."))
+
+})
+
+export { registerUser, generateAccessandRefreshTokens }
+
+
