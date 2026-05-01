@@ -1,6 +1,6 @@
-import { User } from '../models/user.model.js';
+import { User } from '../models/user.models.js';
 import { apiResponse } from '../utils/api-response.js';
-import { asyncHandler } from '../utils/async-handler.js';
+import asyncHandler from "../utils/async-handler.js";
 import { apiError } from '../utils/api-error.js';
 import { emailVerificationMailgenContent, sendEmail } from '../utils/mail.js';
 
@@ -23,26 +23,29 @@ const generateAccessandRefreshTokens = async (userId) => {
 
 const registerUser = asyncHandler(async (req, res) => {
 
-    const { email, username, password, role } = req.body
+    const { email, username, password, role, FullName, fullName } = req.body
     const existedUser = await User.findOne({
         $or: [{ email }, { username }]
     })
     if (existedUser) {
         throw new apiError(409, "User with the provided email or username already exists.")
     }
+    const name = FullName ?? fullName ?? username
     const user = await User.create({
         email,
         username,
+        FullName: name,
         password,
         isEmailVerified: false,
 
     })
+    
+
 
     const { unHashedToken, hashedToken, hashedTokenExpiration } = user.generateTemporaryToken();
 
     user.emailVerificationToken = hashedToken
-    user.emailVerificationExpiry = hashedTokenExpiration
-
+    user.emailVerificationTokenExpiration = hashedTokenExpiration;
     await user.save({ validateBeforeSave: false })
 
     await sendEmail({
@@ -63,7 +66,11 @@ const registerUser = asyncHandler(async (req, res) => {
     }
     return res
         .status(201)
-        .json(new apiResponse(200, "User registered successfully. Please check your email to verify your account."))
+        .json(new apiResponse(200, "User registered successfully. Please check your email to verify your account.",
+
+            { user: CreatedUser }
+        ))
+         
 
 })
 

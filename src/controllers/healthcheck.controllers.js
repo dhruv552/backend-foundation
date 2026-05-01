@@ -1,5 +1,5 @@
-import {APIResponse} from '../utils/api-response.js'; 
-import asyncHandler from '../utils/async-handler.js';   
+import {apiResponse} from '../utils/api-response.js'; 
+import asyncHandler from "../utils/async-handler.js";
 
 
 /**
@@ -22,7 +22,7 @@ const healthCheck = async (req, res, next) => {
 const healthCheck = asyncHandler(async (req, res) => {
     res
     .status(200)
-    .json(new APIResponse(200, {message: 'Server is Running '}));
+    .json(new apiResponse(200, {message: 'Server is Running '}));
 })
  
 export{healthCheck};
