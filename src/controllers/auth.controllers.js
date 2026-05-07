@@ -260,7 +260,7 @@ const forgotPasswordButton = asyncHandler(async (req, res) => {
         subject: "Password Reset Request for Project Management App",
         mailgenContent: emailVerificationMailgenContent(
             user.username,
-            `${process.env.FORGOT_PASSWORD_REDIRECT_URL}?token=${unHashedToken}`
+            `${process.env.FORGOT_PASSWORD_REDIRECT_URL}?resetToken=${unHashedToken}`
         )
     })
 
@@ -289,20 +289,24 @@ const resetForgotPassword = asyncHandler(async (req, res) => {
     })
 
     if(!user){
-        throw new apiError(489, "Invalid or expired password reset token.")
+        throw new apiError(400, "Invalid or expired password reset token.")
     }
 
     user.forgotPasswordExpiry = undefined
     user.forgotPasswordToken = undefined
+    user.refreshToken = undefined
 
     user.password = newPassword
-    await user.save({validateBeforeSave: false})
+    await user.save()
 
     return res
+    .clearCookie("accessToken")
+    .clearCookie("refreshToken")
     .status(200)
     .json(new apiResponse(
         200, {}, "Password reset successfully. You can now login with your new password."
     ))
+
 
 }) 
 
@@ -316,13 +320,18 @@ const changeCurrentPassword = asyncHandler(async (req, res) => {
     }
 
     user.password = newPassword
-    await user.save({validateBeforeSave: false})
+    user.refreshToken = undefined
+    await user.save()
 
     return res
+    .clearCookie("accessToken")
+    .clearCookie("refreshToken")
     .status(200)
     .json(new apiResponse(
         200, {}, "Password changed successfully. You can now login with your new password."
     ))
+  
+    
 }) 
 
 export {
