@@ -4,6 +4,7 @@ import asyncHandler from "../utils/async-handler.js";
 import { apiError } from '../utils/api-error.js';
 import { emailVerificationMailgenContent, sendEmail } from '../utils/mail.js';
 import jwt from 'jsonwebtoken';
+import crypto from 'crypto';
 
 const generateAccessandRefreshTokens = async (userId) => {
     try {
@@ -142,14 +143,14 @@ const getCurrentUser = asyncHandler(async (req, res) => {
 })
 
 const verifyEmail = asyncHandler(async (req, res) => {
-    const {verificationtoken} = req.query
-    if (!verificationtoken) {
+    const {token} = req.params
+    if (!token) {
         throw new apiError(400, "Email Verification token is missing.")
     }
 
     let hashedToken = crypto
     .createHash("sha256")
-    .update(verificationtoken)
+    .update(token)
     .digest("hex")
 
     const user = await User.findOne({
