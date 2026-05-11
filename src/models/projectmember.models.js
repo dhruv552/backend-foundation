@@ -1,5 +1,5 @@
 import mongoose, { Schema } from "mongoose";
-import {AvailableRoles,UserRoleEnum } from "../utils/constants.js";
+import {AvailableRoles,UserRolesEnum } from "../utils/constants.js";
 
 const projectMemberSchema = new Schema({
     user:{
@@ -15,7 +15,7 @@ const projectMemberSchema = new Schema({
     role:{
         type: String,
         enum: AvailableRoles,
-        default: UserRoleEnum.MEMBER,  
+        default: UserRolesEnum.MEMBER,  
     }
 },
 {timestamps: true,})

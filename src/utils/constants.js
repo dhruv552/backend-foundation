@@ -1,10 +1,10 @@
-export const UserRoleEnum ={
+export const UserRolesEnum ={
     ADMIN: 'admin',
     PROJECT_ADMIN:"project_admin",
     MEMBER: 'member'
 }
 
-export const AvailableRoles = Object.values(UserRoleEnum);
+export const AvailableRoles = Object.values(UserRolesEnum);
 
 export const TaskStatusEnum = {
     TODO : "ToDo",
