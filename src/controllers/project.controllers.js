@@ -74,7 +74,7 @@ const deleteProject = asyncHandler(async (req, res) => {
 })
 
 const getProject = asyncHandler(async (req, res) => {
-     // test
+    // test
 })
 
 const getProjectById = asyncHandler(async (req, res) => {
