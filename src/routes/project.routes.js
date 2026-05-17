@@ -11,7 +11,7 @@ import {
     updateProject,
     deleteProject,
     addMemberToProject,
-    getProejctMembers,
+    getProjectMembers,
     updateMemberRole,
     deleteMemberRole,
         } from "../controllers/project.controllers.js";
@@ -33,7 +33,7 @@ router.route("/:projectId")
 
 router
     .route("/:projectID/members")
-    .get(getProejctMembers)
+    .get(getProjectMembers)
     .post(
         validateProjectPermissions([UserRolesEnum.ADMIN])
         ,addMemberToProjectValidator()

@@ -5,7 +5,7 @@ import { Project } from '../models/project.models.js';
 import { ProjectMember } from '../models/projectmember.models.js';
 import { User } from '../models/user.models.js';
 import mongoose from 'mongoose';
-import { AvailableRoles } from '../utils/constants.js'
+import { AvailableUserRoles,UserRolesEnum} from '../utils/constants.js'
 
 const createProject = asyncHandler(async (req, res) => {
     const { name, description } = req.body;
@@ -114,12 +114,12 @@ const getProject = asyncHandler(async (req, res) => {
         {
             $project: {
                 project: {
-                    _id: 1,
-                    name: 1,
-                    description: 1,
-                    members: 1,
-                    createdAt: 1,
-                    createdBy: 1,
+                    _id: "$projects._id",
+                    name: "$projects.name",
+                    description: "$projects.description",
+                    members: "$projects.members",
+                    createdAt: "$projects.createdAt",
+                    createdBy: "$projects.createdBy",
                 },
                 role: 1,
                 _id: 0,
@@ -190,7 +190,7 @@ const addMemberToProject = asyncHandler(async (req, res) => {
         )
 })
 
-const getProejctMembers = asyncHandler(async (req, res) => {
+const getProjectMembers = asyncHandler(async (req, res) => {
     const { projectId } = req.params;
     const project = await Project.findById(projectId);
     if (!project) {
@@ -252,7 +252,7 @@ const getProejctMembers = asyncHandler(async (req, res) => {
 const updateMemberRole = asyncHandler(async (req, res) => {
     const { projectId, userId } = req.params;
     const { newRole } = req.body;
-    if (!AvailableRoles.includes(newRole)) {
+    if (!AvailableUserRoles.includes(newRole)) {
         throw new apiError(400, "Invalid role");
     }
     let projectMember = await ProjectMember.findOne({
@@ -315,7 +315,7 @@ export {
     updateProject,
     deleteProject,
     addMemberToProject,
-    getProejctMembers,
+    getProjectMembers,
     updateMemberRole,
     deleteMemberRole,
 }
